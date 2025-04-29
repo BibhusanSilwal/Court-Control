@@ -1,0 +1,128 @@
+@charset "UTF-8";
+
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background-color: #8B4513; /* Brown color from the screenshot */
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 0;
+    font-family: Arial, sans-serif;
+}
+
+.sidebar-header {
+    padding: 0 20px;
+    margin-bottom: 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo svg {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #D3D3D3 !important; /* Light gray for inactive links */
+    text-decoration: none !important; /* Remove underline */
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item .icon {
+    margin-right: 0.75rem;
+}
+
+.nav-item:hover {
+    background-color: #A0522D; /* Slightly lighter brown for hover */
+    color: white !important;
+}
+
+.nav-item.active {
+    background-color: #A0522D; /* Slightly lighter brown for active */
+    color: white !important;
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    color: #D3D3D3;
+    font-size: 14px;
+}
+
+.user-role {
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.user-email {
+    color: #D3D3D3;
+    margin-right: 10px;
+}
+
+.logout-btn {
+    color: #D3D3D3;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.logout-btn:hover {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .sidebar-header {
+        margin-bottom: 0;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .nav-item .icon {
+        display: none;
+    }
+
+    .sidebar-footer {
+        margin-bottom: 0;
+    }
+}

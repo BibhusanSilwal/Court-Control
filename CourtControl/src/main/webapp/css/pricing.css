@@ -1,0 +1,210 @@
+@charset "UTF-8";
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Pricing Section */
+.pricing-section {
+    padding: 4rem 2rem;
+    background-color: #f7f7f7;
+    text-align: center;
+}
+
+.pricing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pricing-container h1 {
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.pricing-plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.pricing-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.pricing-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-card .price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ff6200;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-card .description {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.pricing-card .features {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.pricing-card .features li {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.pricing-card .features li::before {
+    content: "✓";
+    color: #28a745;
+    position: absolute;
+    left: 0;
+}
+
+.pricing-card .get-started-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    background-color: #ff6200;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.pricing-card .get-started-btn:hover {
+    background-color: #e55a00;
+}
+
+/* Additional Services Section */
+.services-section {
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.services-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.services-container h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 2rem;
+}
+
+.services-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.service-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.service-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.service-card p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.service-card .price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ff6200;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pricing-section, .services-section {
+        padding: 2rem 1rem;
+    }
+
+    .pricing-container h1, .services-container h2 {
+        font-size: 1.75rem;
+    }
+
+    .pricing-card, .service-card {
+        padding: 1.5rem;
+    }
+
+    .pricing-card h3, .service-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .pricing-card .price {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-card .get-started-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    .pricing-card .features li, .service-card p {
+        font-size: 0.9rem;
+    }
+}

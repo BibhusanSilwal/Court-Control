@@ -1,0 +1,165 @@
+@charset "UTF-8";
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+}
+
+.container {
+    display: flex;
+}
+
+.main-content {
+    margin-left: 220px; /* Match sidebar width */
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.add-btn {
+    background-color: #ff6200;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.add-btn:hover {
+    background-color: #e55a00;
+}
+
+.courts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.court-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.court-image {
+    position: relative;
+}
+
+.court-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.court-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: white;
+}
+
+.court-status.available {
+    background-color: #28a745;
+}
+
+.court-status.occupied {
+    background-color: #ff6f61;
+}
+
+.court-status.maintenance {
+    background-color: #f1c40f;
+}
+
+.court-details {
+    padding: 20px;
+}
+
+.court-details h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.court-price {
+    color: #ff6200;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.court-features h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+.court-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.court-features li {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 15px;
+}
+
+.court-features li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #666;
+}
+
+.court-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.edit-btn, .delete-btn {
+    text-decoration: none;
+    font-size: 18px;
+    color: #666;
+}
+
+.edit-btn:hover {
+    color: #007bff;
+}
+
+.delete-btn:hover {
+    color: #ff0000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .courts-grid {
+        grid-template-columns: 1fr;
+    }
+}

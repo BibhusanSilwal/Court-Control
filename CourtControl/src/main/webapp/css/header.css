@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+/* Navigation Bar */
+.nav-links{
+	display:flex;
+	align-items:center;
+	}
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #EA580C;
+    padding:0px 10px;
+    color: white;
+}
+
+.nav-bar > div {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-bar .nav-links img {
+	width: 70px;
+}
+
+.nav-bar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-bar a:hover {
+    color: orange;
+}
+.login a{
+	
+	color:white;
+	padding:5px 10px;
+	border-radius:5px; 
+}
+.register a{
+	background-color:white;
+	color: #EA580C;
+	padding:5px 10px;
+	border-radius:5px; 
+}
