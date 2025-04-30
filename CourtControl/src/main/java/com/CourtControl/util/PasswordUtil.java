@@ -36,9 +36,9 @@ public class PasswordUtil {
         return p1 != null && p1.equals(p2);
     }
     public static boolean validate(String storedEncryptedPassword, String inputPassword) throws Exception {
-        System.out.println("VALIDATE METHOD CALLED");
+      
         if (storedEncryptedPassword == null || !storedEncryptedPassword.contains(":")) return false;
-        System.out.println("VALIDATE METHOD not");
+        
         String[] parts = storedEncryptedPassword.split(":");
         if (parts.length != 2) return false;
 
