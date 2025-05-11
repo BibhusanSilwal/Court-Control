@@ -1,21 +1,45 @@
 package com.CourtControl.model;
 
+import java.util.Date;
+
 public class FeedbackModel {
     private int contactId;
-    private int userId; // Add userId field
-    private String name;
-    private String email;
-    private String message;
+    private int userId;
+    private String contactName;
+    private String contactEmail;
+    private String feedbackText; // Maps to feedback_text in the database
+    private Date submissionDate; // Maps to submitted_at
+    private String contactStatus;
 
-    public FeedbackModel(int contactId, int userId, String name, String email, String message) {
+    // Additional fields for JSP compatibility
+    private String userName; // Alias for contactName
+    private String message;  // Alias for feedbackText (for sendFeedback compatibility)
+
+    // Constructor for retrieving feedback from database
+    public FeedbackModel(int contactId, int userId, String contactName, String contactEmail, 
+                         String feedbackText, Date submissionDate, String contactStatus) {
         this.contactId = contactId;
         this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.message = message;
+        this.contactName = contactName;
+        this.contactEmail = contactEmail;
+        this.feedbackText = feedbackText;
+        this.submissionDate = submissionDate;
+        this.contactStatus = contactStatus;
+        this.userName = contactName; // Sync with JSP
+        this.message = feedbackText; // Sync with sendFeedback
     }
 
-    // Getters and setters
+    // Constructor for creating feedback before insertion
+    public FeedbackModel(int userId, String contactName, String contactEmail, String message) {
+        this.userId = userId;
+        this.contactName = contactName;
+        this.contactEmail = contactEmail;
+        this.message = message;
+        this.feedbackText = message; // Sync with feedbackText
+        this.userName = contactName; // Sync with JSP
+    }
+
+    // Getters and Setters
     public int getContactId() {
         return contactId;
     }
@@ -32,20 +56,55 @@ public class FeedbackModel {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+        this.userName = contactName; // Sync with userName
     }
 
-    public String getEmail() {
-        return email;
+    public String getContactEmail() {
+        return contactEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getFeedbackText() {
+        return feedbackText;
+    }
+
+    public void setFeedbackText(String feedbackText) {
+        this.feedbackText = feedbackText;
+        this.message = feedbackText; // Sync with message
+    }
+
+    public Date getSubmissionDate() {
+        return submissionDate;
+    }
+
+    public void setSubmissionDate(Date submissionDate) {
+        this.submissionDate = submissionDate;
+    }
+
+    public String getContactStatus() {
+        return contactStatus;
+    }
+
+    public void setContactStatus(String contactStatus) {
+        this.contactStatus = contactStatus;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+        this.contactName = userName; // Sync with contactName
     }
 
     public String getMessage() {
@@ -54,5 +113,6 @@ public class FeedbackModel {
 
     public void setMessage(String message) {
         this.message = message;
+        this.feedbackText = message; // Sync with feedbackText
     }
 }

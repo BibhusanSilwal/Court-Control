@@ -16,6 +16,10 @@
                 <h1>Add New Court</h1>
             </div>
 
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+
             <div class="form-card">
                 <form action="${pageContext.request.contextPath}/admin/saveCourt" method="post" enctype="multipart/form-data">
                     <div class="form-group">
@@ -24,8 +28,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="price">Price (NPR/hour)</label>
-                        <input type="number" id="price" name="price" placeholder="e.g., 1200" min="0" required>
+                        <label for="courttype">Court Type</label>
+                        <select id="courttype" name="courttype" required>
+                            <c:forEach var="courttype" items="${courttypes}">
+                                <option value="${courttype.split(' \\(NPR')[0]}">${courttype}</option>
+                            </c:forEach>
+                        </select>
                     </div>
 
                     <div class="form-group">

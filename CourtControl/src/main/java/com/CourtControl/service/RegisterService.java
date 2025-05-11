@@ -12,7 +12,7 @@ import java.sql.Statement;
 public class RegisterService {
 
     public CustomerModel registerUser(CustomerModel user) {
-        String sql = "INSERT INTO user (firstname, lastname, username, password, gender, dob, number, email, img, role) " +
+        String sql = "INSERT INTO user (first_name, last_name, username, password, gender, dob, phone_number, email, image_url, role) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbConfig.getDbConnection();
@@ -54,7 +54,7 @@ public class RegisterService {
             }
             return null; // Insertion succeeded but no user_id retrieved
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace(); // Replace with SLF4J logging
+            e.printStackTrace(); 
             return null;
         }
     }

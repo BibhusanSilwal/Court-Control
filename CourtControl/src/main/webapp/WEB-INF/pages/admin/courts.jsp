@@ -17,18 +17,23 @@
                 <a href="${pageContext.request.contextPath}/admin/addcourt" class="add-btn">+ Add New Court</a>
             </div>
 
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+
             <div class="courts-grid">
                 <c:choose>
                     <c:when test="${not empty courtList}">
                         <c:forEach var="court" items="${courtList}">
                             <div class="court-card">
                                 <div class="court-image">
-                                    <img src="${court.imageUrl}" alt="${court.name}">
+                                    <img src="${court.imageUrl}" alt="${court.courtName}">
                                     <div class="court-status ${court.status.toLowerCase()}">${court.status}</div>
                                 </div>
                                 <div class="court-details">
-                                    <h3>${court.name}</h3>
-                                    <div class="court-price">NPR ${court.price}/hour</div>
+                                    <h3>${court.courtName}</h3>
+                                    <div class="court-type">Type: ${court.courttypeName}</div>
+                                    <div class="court-price">NPR ${court.courtprice}/hour</div>
                                     <div class="court-features">
                                         <h4>Features:</h4>
                                         <ul>
@@ -54,6 +59,7 @@
                             </div>
                             <div class="court-details">
                                 <h3>Indoor Court A</h3>
+                                <div class="court-type">Type: Indoor</div>
                                 <div class="court-price">NPR 1200/hour</div>
                                 <div class="court-features">
                                     <h4>Features:</h4>
@@ -69,50 +75,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="court-card">
-                            <div class="court-image">
-                                <img src="${pageContext.request.contextPath}/resources/images/outdoorcourt.jpg" alt="Outdoor Court B">
-                                <div class="court-status occupied">Occupied</div>
-                            </div>
-                            <div class="court-details">
-                                <h3>Outdoor Court B</h3>
-                                <div class="court-price">NPR 800/hour</div>
-                                <div class="court-features">
-                                    <h4>Features:</h4>
-                                    <ul>
-                                        <li>Flood Lights</li>
-                                        <li>Covered Seating</li>
-                                        <li>Water Station</li>
-                                    </ul>
-                                </div>
-                                <div class="court-actions">
-                                    <a href="#" class="edit-btn">✏️</a>
-                                    <a href="#" class="delete-btn">🗑️</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="court-card">
-                            <div class="court-image">
-                                <img src="${pageContext.request.contextPath}/resources/images/trainingcourt.jpg" alt="Training Court C">
-                                <div class="court-status maintenance">Maintenance</div>
-                            </div>
-                            <div class="court-details">
-                                <h3>Training Court C</h3>
-                                <div class="court-price">NPR 1000/hour</div>
-                                <div class="court-features">
-                                    <h4>Features:</h4>
-                                    <ul>
-                                        <li>Training Equipment</li>
-                                        <li>Score Board</li>
-                                        <li>First Aid Kit</li>
-                                    </ul>
-                                </div>
-                                <div class="court-actions">
-                                    <a href="#" class="edit-btn">✏️</a>
-                                    <a href="#" class="delete-btn">🗑️</a>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Add other static court cards as needed -->
                     </c:otherwise>
                 </c:choose>
             </div>

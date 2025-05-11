@@ -44,19 +44,22 @@
 
             <!-- Edit Mode -->
             <div id="profile-edit" style="display: none;">
-                <form action="${pageContext.request.contextPath}/updateProfile" method="post">
+                <form action="${pageContext.request.contextPath}/userprofile" method="post">
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" name="name" value="${not empty sessionScope.user and not empty sessionScope.user.userName ? sessionScope.user.userName : 'bibhusan silwal'}" required>
+                        <label>Username</label>
+                        <input type="text" name="username" value="${not empty username ? username : sessionScope.user.userName}" required>
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" name="email" value="${not empty sessionScope.user and not empty sessionScope.user.email ? sessionScope.user.email : 'bibhusansilwal62@gmail.com'}" required>
+                        <input type="email" name="email" value="${not empty email ? email : sessionScope.user.email}">
                     </div>
                     <div class="form-group">
                         <label>Phone</label>
-                        <input type="text" name="phone" value="${not empty sessionScope.user and not empty sessionScope.user.number ? sessionScope.user.number : '+977 9803639288'}" required>
+                        <input type="text" name="number" value="${not empty number ? number : sessionScope.user.number}">
                     </div>
+                    <c:if test="${not empty error}">
+                        <p style="color: red;">${error}</p>
+                    </c:if>
                     <div class="form-actions">
                         <button type="button" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
                         <button type="submit" class="save-btn">Save Changes</button>
@@ -66,19 +69,29 @@
         </div>
         <div class="booking-section">
             <h2>Booking History</h2>
+            <c:if test="${not empty successMessage}">
+                <p style="color: green;">${successMessage}</p>
+            </c:if>
+            <c:if test="${not empty error}">
+                <p style="color: red;">${error}</p>
+            </c:if>
             <c:choose>
                 <c:when test="${not empty bookings}">
                     <c:forEach var="booking" items="${bookings}">
                         <div class="booking">
                             <div class="booking-details">
-                                <span>${booking.courtType}</span>
+                                <span>${booking.courtName}</span>
                                 <div class="date-time">
-                                    <span class="icon calendar-icon"></span> ${booking.date}
-                                    <span class="icon clock-icon"></span> ${booking.time}
+                                    <span class="icon calendar-icon"></span> ${booking.bookingDate}
+                                    <span class="icon clock-icon"></span> ${booking.timeSlot}
                                 </div>
                             </div>
                             <div class="status ${booking.status == 'Completed' ? 'completed' : 'upcoming'}">${booking.status}</div>
-                            <div class="price">NPR ${booking.price}</div>
+                            <div class="price">${booking.price}</div>
+                            <form action="${pageContext.request.contextPath}/userprofile/delete" method="post" style="display: inline;">
+                                <input type="hidden" name="bookingId" value="${booking.bookingId}">
+                                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                            </form>
                         </div>
                     </c:forEach>
                 </c:when>

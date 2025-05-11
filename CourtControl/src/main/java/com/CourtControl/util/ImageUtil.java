@@ -1,69 +1,60 @@
 package com.CourtControl.util;
 
+import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import jakarta.servlet.http.Part;
 
-/**
- * Utility class for handling image file uploads.
- */
 public class ImageUtil {
+    public boolean uploadImage(Part filePart, String applicationPath) {
+        String uploadPath = applicationPath + File.separator + "resources" + File.separator + "images";
+        File uploadDir = new File(uploadPath);
 
-    /**
-     * Extracts the file name from the given Part object and adds a timestamp to ensure uniqueness.
-     */
-    public String getImageNameFromPart(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        String[] items = contentDisp.split(";");
+        // Debug: Print the upload path
+        System.out.println("Attempting to upload to: " + uploadPath);
 
-        String imageName = null;
-        for (String s : items) {
-            if (s.trim().startsWith("filename")) {
-                imageName = s.substring(s.indexOf("=") + 2, s.length() - 1);
-                break;
+        if (!uploadDir.exists()) {
+            System.out.println("Directory does not exist. Attempting to create...");
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                System.out.println("Failed to create directory: " + uploadPath);
+                return false;
             }
+            System.out.println("Directory created successfully.");
         }
 
-        if (imageName == null || imageName.isEmpty()) {
-            imageName = "download.png";
+        String fileName = getImageNameFromPart(filePart);
+        if (fileName == null || fileName.isEmpty()) {
+            System.out.println("Invalid or empty filename from part.");
+            return false;
         }
-
-        // Add timestamp to ensure uniqueness
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        int lastDotIndex = imageName.lastIndexOf(".");
-        if (lastDotIndex != -1) {
-            String namePart = imageName.substring(0, lastDotIndex);
-            String extension = imageName.substring(lastDotIndex);
-            imageName = namePart + "_" + timestamp + extension;
-        } else {
-            imageName = imageName + "_" + timestamp + ".png";
-        }
-
-        return imageName;
-    }
-
-    /**
-     * Uploads the image file to the resources/images directory in the web application.
-     */
-    public boolean uploadImage(Part part, String rootPath) {
-        String savePath = rootPath + File.separator + "resources" + File.separator + "images";
-        File fileSaveDir = new File(savePath);
-
-        // Ensure the directory exists
-        if (!fileSaveDir.exists()) {
-            if (!fileSaveDir.mkdirs()) {
-                return false; // Failed to create the directory
-            }
-        }
+        System.out.println("Extracted filename: " + fileName);
 
         try {
-            String imageName = getImageNameFromPart(part);
-            String filePath = savePath + File.separator + imageName;
-            part.write(filePath);
-            return true; // Upload successful
+            File file = new File(uploadPath + File.separator + fileName);
+            filePart.write(file.getAbsolutePath());
+            System.out.println("Image saved to: " + file.getAbsolutePath());
+            return true;
         } catch (IOException e) {
-            e.printStackTrace(); // Log the exception
-            return false; // Upload failed
+            System.out.println("IOException during file upload: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    public String getImageNameFromPart(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        System.out.println("Content-Disposition header: " + contentDisposition);
+        if (contentDisposition != null) {
+            String[] tokens = contentDisposition.split(";");
+            for (String token : tokens) {
+                if (token.trim().startsWith("filename")) {
+                    String fileName = token.substring(token.indexOf("=") + 1).trim().replace("\"", "");
+                    System.out.println("Parsed filename: " + fileName);
+                    return fileName;
+                }
+            }
+        }
+        System.out.println("No filename found in content-disposition.");
+        return null;
     }
 }

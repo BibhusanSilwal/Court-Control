@@ -46,18 +46,39 @@ public class ContactusController extends HttpServlet {
         HttpSession session = request.getSession(false); // false means don't create a new session
         int userId = 0; // Default to 0 if no session or userId
         if (session != null && session.getAttribute("userId") != null) {
-        	userId = Integer.parseInt((String) session.getAttribute("userId"));
+            Object userIdObj = session.getAttribute("userId");
+            if (userIdObj instanceof Integer) {
+                userId = (Integer) userIdObj;
+            } else if (userIdObj instanceof String) {
+                try {
+                    userId = Integer.parseInt((String) userIdObj);
+                } catch (NumberFormatException e) {
+                    // Log the error and keep userId as 0
+                    System.err.println("Invalid userId format in session: " + userIdObj);
+                }
+            }
         }
 
-        // Simple validation (you can enhance this with more checks if needed)
-        if (name != null && !name.isEmpty() && email != null && !email.isEmpty() && message != null && !message.isEmpty()) {
-            FeedbackModel feedback = new FeedbackModel(0, userId, name, email, message);
-            FeedbackService fserv = new FeedbackService();
-            fserv.sendFeedback(feedback);
+        // Enhanced validation
+        if (name == null || name.trim().isEmpty() || 
+            email == null || email.trim().isEmpty() || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$") || 
+            message == null || message.trim().isEmpty()) {
+            // If validation fails, show an error message
+            request.setAttribute("errorMessage", "Please fill in all fields correctly. Ensure email is valid.");
+            request.getRequestDispatcher("WEB-INF/pages/contactus.jsp").forward(request, response);
+            return;
+        }
+
+        // Create FeedbackModel and send feedback
+        FeedbackModel feedback = new FeedbackModel(userId, name.trim(), email.trim(), message.trim());
+        FeedbackService fserv = new FeedbackService();
+        FeedbackModel result = fserv.sendFeedback(feedback);
+        
+        // Check if the feedback was successfully submitted
+        if (result != null) {
             request.setAttribute("successMessage", "Thank you for contacting us! We'll get back to you soon.");
         } else {
-            // If fields are missing, show an error message
-            request.setAttribute("errorMessage", "Please fill in all fields.");
+            request.setAttribute("errorMessage", "Failed to submit feedback. Please try again later.");
         }
 
         // Forward to the contact us page to show the result

@@ -28,15 +28,15 @@
                         <h2>1. Select a Court</h2>
                         <div class="court-selection">
                             <c:forEach var="court" items="${courts}">
-                                <div class="court-card" data-court-id="${court.id}" onclick="selectCourt(this, '${court.id}', '${court.name}', '${court.price}')">
-                                    <img src="${pageContext.request.contextPath}/resources/images/${court.image}" alt="${court.name}">
-                                    <h3>${court.name}</h3>
-                                    <p>${court.description}</p>
-                                    <p class="price">NPR ${court.price} /hour</p>
+                                <div class="court-card" data-court-id="${court.id}" onclick="selectCourt(this, '${court.id}', '${court.courtName}', '${court.courtprice}')">
+                                    <img src="${pageContext.request.contextPath}${court.imageUrl}" alt="${court.courtName}">
+                                    <h3>${court.courtName}</h3>
+                                    <p>${court.features != null && !court.features.isEmpty() ? court.features.get(0) : 'No description available'}</p>
+                                    <p class="price">NPR ${court.courtprice} /hour</p>
                                     <span class="selected-badge">Selected</span>
                                 </div>
                             </c:forEach>
-                            <!-- Static fallback if courts are not set -->
+                            <!-- Static fallback if courts are not set (optional, can be removed if dynamic data works) -->
                             <c:if test="${empty courts}">
                                 <div class="court-card" data-court-id="1" onclick="selectCourt(this, '1', 'Indoor Court', '1200')">
                                     <img src="${pageContext.request.contextPath}/resources/images/indoorcourt.jpg" alt="Indoor Court">
@@ -124,11 +124,11 @@
                             <span id="summary-time">Not selected</span>
                         </div>
                         <c:if test="${not empty success}">
-        <div class="success-message">${success}</div>
-    </c:if>
-    <c:if test="${not empty error}">
-        <div class="error-message">${error}</div>
-    </c:if>
+                            <div class="success-message">${success}</div>
+                        </c:if>
+                        <c:if test="${not empty error}">
+                            <div class="error-message">${error}</div>
+                        </c:if>
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <!-- User is logged in, show Book Now button -->

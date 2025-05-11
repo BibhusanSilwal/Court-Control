@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -38,23 +39,22 @@
                         <c:when test="${not empty feedbackList}">
                             <c:forEach var="feedback" items="${feedbackList}">
                                 <tr>
-                                    <td>${feedback.userName}</td>
-                                    <td>${feedback.feedbackText}</td>
-                                    <td>${feedback.submittedAt}</td>
+                                    <td><c:out value="${feedback.userName}"/></td>
+                                    <td><c:out value="${feedback.feedbackText}"/></td>
+                                    <td>
+                                        <c:if test="${not empty feedback.submissionDate}">
+                                            <fmt:formatDate value="${feedback.submissionDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                        </c:if>
+                                        <c:if test="${empty feedback.submissionDate}">
+                                            N/A
+                                        </c:if>
+                                    </td>
                                 </tr>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <!-- Fallback Static Feedback Data -->
                             <tr>
-                                <td>bibhusan silwal</td>
-                                <td>Great service, loved the court booking system!</td>
-                                <td>2023-05-10 14:30:00</td>
-                            </tr>
-                            <tr>
-                                <td>Anup Wagle</td>
-                                <td>The courts are well-maintained, but the app could be faster.</td>
-                                <td>2023-05-12 09:15:00</td>
+                                <td colspan="3">No feedback available.</td>
                             </tr>
                         </c:otherwise>
                     </c:choose>

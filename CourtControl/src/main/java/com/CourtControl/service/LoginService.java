@@ -22,15 +22,15 @@ public class LoginService {
                     if (PasswordUtil.validate(storedPassword, inputPassword)) {
                         return new CustomerModel(
                             rs.getInt("user_id"),
-                            rs.getString("firstname"),
-                            rs.getString("lastname"),
+                            rs.getString("first_name"),
+                            rs.getString("last_name"),
                             rs.getString("username"),
                             storedPassword,
                             rs.getString("gender"),
                             rs.getString("dob"),
-                            rs.getString("number"),
+                            rs.getString("phone_number"),
                             rs.getString("email"),
-                            rs.getString("img"),
+                            rs.getString("image_url"),
                             rs.getString("role") // Fetch role
                         );
                     }
@@ -52,15 +52,15 @@ public class LoginService {
                 if (rs.next()) {
                     return new CustomerModel(
                         rs.getInt("user_id"),
-                        rs.getString("firstname"),
-                        rs.getString("lastname"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("gender"),
                         rs.getString("dob"),
-                        rs.getString("number"),
+                        rs.getString("phonenumber"),
                         rs.getString("email"),
-                        rs.getString("img"),
+                        rs.getString("image_url"),
                         rs.getString("role") // Fetch role
                     );
                 }

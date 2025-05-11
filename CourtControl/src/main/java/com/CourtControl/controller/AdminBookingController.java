@@ -21,8 +21,15 @@ public class AdminBookingController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<BookingModel> bookings = bookingService.getRecentBookings(10);
-        request.setAttribute("bookings", bookings);
+        List<BookingModel> bookings;
+		try {
+			bookings = bookingService.getRecentBookings(10);
+			request.setAttribute("bookings", bookings);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         request.getRequestDispatcher("/WEB-INF/pages/admin/adminbooking.jsp").forward(request, response);
     }
 }

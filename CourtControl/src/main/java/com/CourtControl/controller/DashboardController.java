@@ -30,10 +30,17 @@ public class DashboardController extends HttpServlet {
 //        }
 
         // Fetch recent bookings
-        List<BookingModel> bookings = bookingService.getRecentBookings(5);
-        request.setAttribute("bookings", bookings);
-
-        request.getRequestDispatcher("/WEB-INF/pages/admin/dashboard.jsp").forward(request, response);
+        List<BookingModel> bookings;
+		try {
+			bookings = bookingService.getRecentBookings(5);
+			request.setAttribute("bookings", bookings);
+			request.getRequestDispatcher("/WEB-INF/pages/admin/dashboard.jsp").forward(request, response);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
