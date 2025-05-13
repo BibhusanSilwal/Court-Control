@@ -149,7 +149,8 @@ public class CourtController extends HttpServlet {
             return;
         }
 
-        courttype = courttype.split(" \\\\(NPR")[0];
+        // Fix: Correct regex pattern to split "Indoor (NPR 2400/hour)" and extract "Indoor"
+        courttype = courttype.split(" \\(NPR ")[0]; // Split on " (NPR " to get the courttype
 
         Part filePart = request.getPart("courtImage");
         String imageUrl = "";

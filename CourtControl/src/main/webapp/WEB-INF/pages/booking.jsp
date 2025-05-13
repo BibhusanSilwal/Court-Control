@@ -29,7 +29,7 @@
                         <div class="court-selection">
                             <c:forEach var="court" items="${courts}">
                                 <div class="court-card" data-court-id="${court.id}" onclick="selectCourt(this, '${court.id}', '${court.courtName}', '${court.courtprice}')">
-                                    <img src="${pageContext.request.contextPath}${court.imageUrl}" alt="${court.courtName}">
+                                    <img src="${court.imageUrl}" alt="${court.courtName}">
                                     <h3>${court.courtName}</h3>
                                     <p>${court.features != null && !court.features.isEmpty() ? court.features.get(0) : 'No description available'}</p>
                                     <p class="price">NPR ${court.courtprice} /hour</p>

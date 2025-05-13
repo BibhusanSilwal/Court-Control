@@ -21,22 +21,22 @@
             <section class="metrics">
                 <div class="metric-card">
                     <h3>Total Bookings</h3>
-                    <p class="metric-value">1,284</p>
+                    <p class="metric-value">${totalBookings}</p>
                     <p class="metric-change positive">+12% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Revenue</h3>
-                    <p class="metric-value">NPR 156,000</p>
+                    <p class="metric-value">${totalRevenue}</p>
                     <p class="metric-change positive">+8% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Active Users</h3>
-                    <p class="metric-value">521</p>
+                    <p class="metric-value">${activeUsers}</p>
                     <p class="metric-change positive">+18% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Avg. Session</h3>
-                    <p class="metric-value">1.8 hours</p>
+                    <p class="metric-value">${avgSession}</p>
                     <p class="metric-change positive">+5% from last month</p>
                 </div>
             </section>
@@ -44,29 +44,24 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Bookings by Court</h3>
-                        <select>
-                            <option>Last 7 days</option>
-                            <option>Last 30 days</option>
-                            <option>Last 90 days</option>
+                        <select id="bookingsTimeRange" onchange="updateBookingsChart()">
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
                         </select>
                     </div>
-                    <div class="chart-placeholder">
-                        <p>Chart visualization</p>
-                    </div>
+                    <canvas id="bookingsChart" width="400" height="200"></canvas>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Revenue Overview</h3>
-                        <select>
-                            <option>Last 7 days</option>
-                            <option>Last 30 days</option>
-                            <option>Last 90 days</option>
+                        <select id="revenueTimeRange" onchange="updateRevenueChart()">
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
                         </select>
                     </div>
-                    <div class="chart-placeholder">
-                        
-                        <p>Chart visualization</p>
-                    </div>
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
                 </div>
             </section>
             <section class="recent-bookings">
@@ -104,5 +99,97 @@
             </section>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        // Bookings by Court Chart
+        console.log("Initializing Bookings Chart");
+        const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
+        let bookingsChart;
+        if (bookingsCtx) {
+            bookingsChart = new Chart(bookingsCtx, {
+                type: 'bar',
+                data: {
+                    labels: [<c:forEach var="label" items="${bookingsByCourtLabels}" varStatus="loop">'${label}'${loop.last ? '' : ','}</c:forEach>],
+                    datasets: [{
+                        label: 'Bookings',
+                        data: [<c:forEach var="data" items="${bookingsByCourtData}" varStatus="loop">${data}${loop.last ? '' : ','}</c:forEach>],
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            console.log("Bookings Chart initialized");
+        } else {
+            console.error("Bookings Chart canvas not found");
+        }
+
+        // Revenue Overview Chart
+        console.log("Initializing Revenue Chart");
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        let revenueChart;
+        if (revenueCtx) {
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: [<c:forEach var="label" items="${dailyRevenueLabels}" varStatus="loop">'${label}'${loop.last ? '' : ','}</c:forEach>],
+                    datasets: [{
+                        label: 'Revenue (NPR)',
+                        data: [<c:forEach var="data" items="${dailyRevenueData}" varStatus="loop">${data}${loop.last ? '' : ','}</c:forEach>],
+                        fill: false,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            console.log("Revenue Chart initialized");
+        } else {
+            console.error("Revenue Chart canvas not found");
+        }
+
+        function updateBookingsChart() {
+            const timeRange = document.getElementById('bookingsTimeRange').value;
+            fetch('${pageContext.request.contextPath}/admin/chart-data?chartType=bookings&days=' + timeRange)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching bookings data:', data.error);
+                        return;
+                    }
+                    bookingsChart.data.labels = data.labels;
+                    bookingsChart.data.datasets[0].data = data.data;
+                    bookingsChart.update();
+                    console.log('Bookings Chart updated with data:', data);
+                })
+                .catch(error => console.error('Error fetching bookings data:', error));
+        }
+
+        function updateRevenueChart() {
+            const timeRange = document.getElementById('revenueTimeRange').value;
+            fetch('${pageContext.request.contextPath}/admin/chart-data?chartType=revenue&days=' + timeRange)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching revenue data:', data.error);
+                        return;
+                    }
+                    revenueChart.data.labels = data.labels;
+                    revenueChart.data.datasets[0].data = data.data;
+                    revenueChart.update();
+                    console.log('Revenue Chart updated with data:', data);
+                })
+                .catch(error => console.error('Error fetching revenue data:', error));
+        }
+    </script>
 </body>
 </html>

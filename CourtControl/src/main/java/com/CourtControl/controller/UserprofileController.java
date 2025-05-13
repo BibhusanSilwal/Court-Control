@@ -43,6 +43,7 @@ public class UserprofileController extends HttpServlet {
         // Load user's bookings
         List<BookingModel> bookings = new ArrayList<>();
         try {
+            // Fix: Pass userId as int directly
             bookings = bookingService.getUserBookings(user.getUserId());
         } catch (Exception e) {
             request.setAttribute("error", "Failed to load bookings: " + e.getMessage());
@@ -140,12 +141,6 @@ public class UserprofileController extends HttpServlet {
             } else {
                 response.sendRedirect(request.getContextPath() + "/userprofile?error=Could+not+delete+booking.+It+may+not+exist+or+you+lack+permission");
             }
-        } catch (SQLException e) {
-            String message = e.getMessage().contains("foreign key constraint") 
-                ? "Cannot delete booking due to database constraints."
-                : "Database error occurred. Please try again later.";
-            response.sendRedirect(request.getContextPath() + "/userprofile?error=" + java.net.URLEncoder.encode(message, "UTF-8"));
-            e.printStackTrace();
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/userprofile?error=Invalid+booking+ID");
             e.printStackTrace();
@@ -190,6 +185,7 @@ public class UserprofileController extends HttpServlet {
         // Reload bookings for error case
         List<BookingModel> bookings = new ArrayList<>();
         try {
+            // Fix: Pass userId as int directly
             bookings = bookingService.getUserBookings(user.getUserId());
         } catch (Exception e) {
             request.setAttribute("error", message + " Failed to load bookings: " + e.getMessage());

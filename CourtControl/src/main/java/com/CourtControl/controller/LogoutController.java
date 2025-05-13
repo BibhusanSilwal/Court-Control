@@ -1,9 +1,10 @@
 package com.CourtControl.controller;
 
-import com.CourtControl.util.CookieUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
@@ -12,16 +13,7 @@ public class LogoutController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Invalidate the session
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-
-        // Clear the role cookie
-        CookieUtil.removeCookie(response, "role");
-
-        // Redirect to login page
-        response.sendRedirect(request.getContextPath() + "/login");
+        // Redirect to trigger AuthFilter's logout logic
+        response.sendRedirect(request.getContextPath() + "/logout");
     }
 }

@@ -57,8 +57,16 @@ public class BookingController extends HttpServlet {
             return;
         }
 
-        // Retrieve userId
-        String userId = session.getAttribute("userId").toString();
+        // Retrieve userId and convert to int
+        String userIdStr = session.getAttribute("userId").toString();
+        int userId;
+        try {
+            userId = Integer.parseInt(userIdStr);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid user ID format. Please log in again.");
+            request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+            return;
+        }
 
         // Retrieve form data
         String courtId = request.getParameter("courtId");
@@ -77,12 +85,12 @@ public class BookingController extends HttpServlet {
         try {
             // Check for booking conflicts
             if (!bookingService.isCourtAvailable(courtId, bookingDate, timeSlot)) {
-                request.setAttribute("error", "This court is already booked for the selected time slot.");
+                request.setAttribute("error", "The court is not available on " + bookingDate + " from " + timeSlot + ". Please choose a different time or date.");
                 request.getRequestDispatcher("WEB-INF/pages/booking.jsp").forward(request, response);
                 return;
             }
 
-            // Save booking
+            // Save booking with userId as int
             bookingService.saveBooking(courtId, bookingDate, timeSlot, userId);
 
             // Set success message

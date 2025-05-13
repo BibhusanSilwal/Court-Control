@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BookingService {
 
@@ -19,8 +21,7 @@ public class BookingService {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
-     * Checks if a court is available for the specified date and time slot.
-     * @throws ClassNotFoundException 
+     * Checks if a court is available for a given date and time slot.
      */
     public boolean isCourtAvailable(String courtId, String bookingDate, String timeSlot) throws ParseException, ClassNotFoundException {
         String sql = "SELECT COUNT(*) FROM Booking WHERE court_id = ? AND booking_date = ? " +
@@ -57,9 +58,8 @@ public class BookingService {
 
     /**
      * Saves a new booking to the database.
-     * @throws ClassNotFoundException 
      */
-    public void saveBooking(String courtId, String bookingDate, String timeSlot, String userId) throws ParseException, ClassNotFoundException {
+    public void saveBooking(String courtId, String bookingDate, String timeSlot, int userId) throws ParseException, ClassNotFoundException {
         String sql = "INSERT INTO Booking (user_id, court_id, booking_date, start_time, end_time, status) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         
@@ -79,7 +79,7 @@ public class BookingService {
 
         try (Connection conn = DbConfig.getDbConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(userId));
+            stmt.setInt(1, userId); // Use int directly
             stmt.setInt(2, Integer.parseInt(courtId));
             stmt.setDate(3, new java.sql.Date(bookingDateParsed.getTime()));
             stmt.setTimestamp(4, new java.sql.Timestamp(startDateTime.getTime()));
@@ -92,8 +92,7 @@ public class BookingService {
     }
 
     /**
-     * Retrieves recent bookings with a specified limit.
-     * @throws ClassNotFoundException 
+     * Retrieves the most recent bookings, limited by the specified number.
      */
     public List<BookingModel> getRecentBookings(int limit) throws ClassNotFoundException {
         List<BookingModel> bookings = new ArrayList<>();
@@ -121,12 +120,11 @@ public class BookingService {
                     }
                     String courtName = rs.getString("court_name");
                     String bookingDate = dateFormatter.format(rs.getDate("booking_date"));
-                    Date startTime = rs.getTimestamp("start_time");
-                    Date endTime = rs.getTimestamp("end_time");
-                    String timeSlot = timeFormatter.format(startTime) + " - " + timeFormatter.format(endTime);
+                    String startTime = timeFormatter.format(rs.getTimestamp("start_time"));
+                    String endTime = timeFormatter.format(rs.getTimestamp("end_time"));
+                    String timeSlot = startTime + " - " + endTime;
                     String status = rs.getString("status");
-                    double priceValue = rs.getDouble("courtprice");
-                    String price = "NPR " + (int)priceValue;
+                    String price = "NPR " + rs.getInt("courtprice");
 
                     BookingModel booking = new BookingModel(
                         rs.getInt("booking_id"),
@@ -142,17 +140,13 @@ public class BookingService {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Database error fetching recent bookings: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Error retrieving recent bookings", e);
         }
         return bookings;
     }
 
     /**
      * Retrieves bookings for a specific user.
-     * @param userId The ID of the user
-     * @return List of BookingModel objects for the user
-     * @throws ClassNotFoundException 
      */
     public List<BookingModel> getUserBookings(int userId) throws ClassNotFoundException {
         List<BookingModel> bookings = new ArrayList<>();
@@ -180,12 +174,11 @@ public class BookingService {
                     }
                     String courtName = rs.getString("court_name");
                     String bookingDate = dateFormatter.format(rs.getDate("booking_date"));
-                    Date startTime = rs.getTimestamp("start_time");
-                    Date endTime = rs.getTimestamp("end_time");
-                    String timeSlot = timeFormatter.format(startTime) + " - " + timeFormatter.format(endTime);
+                    String startTime = timeFormatter.format(rs.getTimestamp("start_time"));
+                    String endTime = timeFormatter.format(rs.getTimestamp("end_time"));
+                    String timeSlot = startTime + " - " + endTime;
                     String status = rs.getString("status");
-                    double priceValue = rs.getDouble("courtprice");
-                    String price = "NPR " + (int)priceValue;
+                    String price = "NPR " + rs.getInt("courtprice");
 
                     BookingModel booking = new BookingModel(
                         rs.getInt("booking_id"),
@@ -201,28 +194,165 @@ public class BookingService {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Database error fetching user bookings: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Error retrieving user bookings", e);
         }
         return bookings;
     }
 
     /**
-     * Deletes a booking from the database if it belongs to the specified user.
-     * @param bookingId The ID of the booking to delete
-     * @param userId The ID of the user attempting to delete the booking
-     * @return true if the booking was deleted, false if it doesn't exist or belongs to another user
-     * @throws SQLException If a database error occurs
-     * @throws ClassNotFoundException 
+     * Deletes a booking by its ID if it belongs to the specified user.
      */
-    public boolean deleteBooking(int bookingId, int userId) throws SQLException, ClassNotFoundException {
-        String sql = "DELETE FROM Booking WHERE booking_id = ? AND user_id = ?";
+    public boolean deleteBooking(int bookingId, int userId) throws ClassNotFoundException {
+        // First, verify the booking belongs to the user
+        String checkSql = "SELECT COUNT(*) FROM Booking WHERE booking_id = ? AND user_id = ?";
+        String deleteSql = "DELETE FROM Booking WHERE booking_id = ? AND user_id = ?";
+
+        try (Connection conn = DbConfig.getDbConnection()) {
+            // Check if the booking exists and belongs to the user
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, bookingId);
+                checkStmt.setInt(2, userId);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    rs.next();
+                    if (rs.getInt(1) == 0) {
+                        return false; // Booking doesn't exist or doesn't belong to the user
+                    }
+                }
+            }
+
+            // Delete the booking
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+                deleteStmt.setInt(1, bookingId);
+                deleteStmt.setInt(2, userId);
+                int rowsAffected = deleteStmt.executeUpdate();
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting booking", e);
+        }
+    }
+
+    /**
+     * Gets the total number of bookings.
+     */
+    public int getTotalBookings() throws ClassNotFoundException {
+        String sql = "SELECT COUNT(*) FROM Booking";
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving total bookings", e);
+        }
+    }
+
+    /**
+     * Gets the total revenue from all bookings.
+     */
+    public double getTotalRevenue() throws ClassNotFoundException {
+        String sql = "SELECT SUM(ct.courtprice) AS total_revenue " +
+                     "FROM Booking b " +
+                     "JOIN Court c ON b.court_id = c.court_id " +
+                     "JOIN CourtType ct ON c.courttype = ct.courttype";
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            rs.next();
+            return rs.getDouble("total_revenue");
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving total revenue", e);
+        }
+    }
+
+    /**
+     * Gets the number of active users (users with at least one booking).
+     */
+    public int getActiveUsers() throws ClassNotFoundException {
+        String sql = "SELECT COUNT(DISTINCT user_id) FROM Booking";
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving active users", e);
+        }
+    }
+
+    /**
+     * Gets the average session duration in hours.
+     */
+    public double getAverageSessionDuration() throws ClassNotFoundException {
+        String sql = "SELECT AVG(TIMESTAMPDIFF(MINUTE, start_time, end_time)) / 60 AS avg_duration " +
+                     "FROM Booking";
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            rs.next();
+            return rs.getDouble("avg_duration");
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving average session duration", e);
+        }
+    }
+
+    /**
+     * Retrieves bookings count by court for a given time range (in days).
+     */
+    public Map<String, Integer> getBookingsByCourt(int days) throws ClassNotFoundException {
+        Map<String, Integer> bookingsByCourt = new TreeMap<>();
+        String sql = "SELECT c.courttype AS court_name, COUNT(b.booking_id) AS booking_count " +
+                     "FROM Booking b " +
+                     "JOIN Court c ON b.court_id = c.court_id " +
+                     "WHERE b.booking_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY) " +
+                     "GROUP BY c.courttype";
+
         try (Connection conn = DbConfig.getDbConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, bookingId);
-            stmt.setInt(2, userId);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            stmt.setInt(1, days);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String courtName = rs.getString("court_name");
+                    int bookingCount = rs.getInt("booking_count");
+                    bookingsByCourt.put(courtName, bookingCount);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching bookings by court", e);
         }
+
+        return bookingsByCourt;
+    }
+
+    /**
+     * Retrieves daily revenue for a given time range (in days).
+     */
+    public Map<String, Double> getDailyRevenue(int days) throws ClassNotFoundException {
+        Map<String, Double> dailyRevenue = new TreeMap<>();
+        String sql = "SELECT DATE(b.booking_date) AS booking_day, SUM(ct.courtprice) AS daily_revenue " +
+                     "FROM Booking b " +
+                     "JOIN Court c ON b.court_id = c.court_id " +
+                     "JOIN CourtType ct ON c.courttype = ct.courttype " +
+                     "WHERE b.booking_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY) " +
+                     "GROUP BY DATE(b.booking_date) " +
+                     "ORDER BY booking_day";
+
+        try (Connection conn = DbConfig.getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, days);
+            try (ResultSet rs = stmt.executeQuery()) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+                while (rs.next()) {
+                    Date bookingDay = rs.getDate("booking_day");
+                    double revenue = rs.getDouble("daily_revenue");
+                    String dayStr = dateFormatter.format(bookingDay);
+                    dailyRevenue.put(dayStr, revenue);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching daily revenue", e);
+        }
+
+        return dailyRevenue;
     }
 }

@@ -8,6 +8,19 @@
     <title>Hoops Heaven - Home</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css" type="text/css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .court-image-placeholder {
+            width: 100%;
+            height: 200px; /* Adjust based on your design */
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
     <jsp:include page="header.jsp"/>
@@ -79,24 +92,46 @@
         <h2>Our World-Class Courts</h2>
         <p class="subtitle">Professional-grade courts for players of all levels</p>
         <div class="courts-container">
-            <div class="court-card">
-                <img src="${pageContext.request.contextPath}/resources/images/indoorcourt.jpg" alt="Indoor Court">
-                <h3>Indoor Court</h3>
-                <p>Climate-controlled indoor court with professional flooring and lighting.</p>
-                <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
-            </div>
-            <div class="court-card">
-                <img src="${pageContext.request.contextPath}/resources/images/outdoorcourt.jpg" alt="Outdoor Court">
-                <h3>Outdoor Court</h3>
-                <p>Premium outdoor court with durable surface and adjustable hoops.</p>
-                <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
-            </div>
-            <div class="court-card">
-                <img src="${pageContext.request.contextPath}/resources/images/trainingcourt.jpg" alt="Training Court">
-                <h3>Training Court</h3>
-                <p>Specialized court with training equipment and shooting machines.</p>
-                <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
-            </div>
+            <c:choose>
+                <c:when test="${not empty courtList}">
+                    <c:forEach var="court" items="${courtList}">
+                        <div class="court-card">
+                            <c:choose>
+                                <c:when test="${not empty court.imageUrl}">
+                                    <img src="${court.imageUrl}" alt="${court.courtName}">
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="court-image-placeholder">No image available</div>
+                                </c:otherwise>
+                            </c:choose>
+                            <h3>${court.courtName}</h3>
+                            <p>${court.features[0] != null ? court.features[0] : 'No features listed'}</p>
+                            <a href="${pageContext.request.contextPath}/booking?courtId=${court.id}" class="court-btn">Book this court</a>
+                        </div>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <!-- Static Fallback -->
+                    <div class="court-card">
+                        <img src="${pageContext.request.contextPath}/resources/images/indoorcourt.jpg" alt="Indoor Court">
+                        <h3>Indoor Court</h3>
+                        <p>Climate-controlled indoor court with professional flooring and lighting.</p>
+                        <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
+                    </div>
+                    <div class="court-card">
+                        <img src="${pageContext.request.contextPath}/resources/images/outdoorcourt.jpg" alt="Outdoor Court">
+                        <h3>Outdoor Court</h3>
+                        <p>Premium outdoor court with durable surface and adjustable hoops.</p>
+                        <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
+                    </div>
+                    <div class="court-card">
+                        <img src="${pageContext.request.contextPath}/resources/images/trainingcourt.jpg" alt="Training Court">
+                        <h3>Training Court</h3>
+                        <p>Specialized court with training equipment and shooting machines.</p>
+                        <a href="${pageContext.request.contextPath}/booking" class="court-btn">Book this court</a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </section>
 
@@ -105,19 +140,19 @@
         <h2>What Our Customers Say</h2>
         <div class="testimonials-container">
             <div class="testimonial-card">
-                <img src="${pageContext.request.contextPath}/resources/images/customer1.jpg" alt="Customer 1">
+                <img src="${pageContext.request.contextPath}/resources/images/aaravsharma.jpg" alt="Customer 1">
                 <h3>Aarav Sharma</h3>
                 <p class="rating">★★★★★</p>
                 <p>"The Court Control system makes booking so easy! I can reserve my preferred court from my phone in seconds."</p>
             </div>
             <div class="testimonial-card">
-                <img src="${pageContext.request.contextPath}/resources/images/customer2.jpg" alt="Customer 2">
+                <img src="${pageContext.request.contextPath}/resources/images/priyamagar.jpg" alt="Customer 2">
                 <h3>Priya Thapa</h3>
                 <p class="rating">★★★★★</p>
                 <p>"Hoops Heaven has the best courts in Kathmandu. The indoor court is perfect during monsoon!"</p>
             </div>
             <div class="testimonial-card">
-                <img src="${pageContext.request.contextPath}/resources/images/customer3.jpg" alt="Customer 3">
+                <img src="${pageContext.request.contextPath}/resources/images/rajeshmagar.jpg" alt="Customer 3">
                 <h3>Rajesh Magar</h3>
                 <p class="rating">★★★★★</p>
                 <p>"I've been playing basketball for years, and Hoops Heaven is by far the best facility in Nepal. Court Control makes scheduling games so simple."</p>

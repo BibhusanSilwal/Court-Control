@@ -2,13 +2,14 @@ package com.CourtControl.filter;
 
 import com.CourtControl.model.CustomerModel;
 import com.CourtControl.service.LoginService;
+import com.CourtControl.util.CookieUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/admin/*")
+@WebFilter(urlPatterns = {"/admin/*", "/logout"})
 public class AuthFilter implements Filter {
 
     private final LoginService loginService;
@@ -28,11 +29,36 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        HttpSession session = httpRequest.getSession(false);
-        String loginURI = httpRequest.getContextPath() + "/login";
-        boolean isLoginRequest = httpRequest.getRequestURI().equals(loginURI);
+        String requestURI = httpRequest.getRequestURI();
+        String contextPath = httpRequest.getContextPath();
+        String loginURI = contextPath + "/login";
+        String logoutURI = contextPath + "/logout";
+        String logoutJspURI = contextPath + "/logout.jsp";
+        boolean isLoginRequest = requestURI.equals(loginURI);
+        boolean isLogoutRequest = requestURI.equals(logoutURI);
+        boolean isLogoutJspRequest = requestURI.equals(logoutJspURI);
+
+        if (isLogoutRequest) {
+            // Handle logout
+            HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            // Clear the role cookie
+            CookieUtil.removeCookie(httpResponse, "role");
+            // Forward to logout.jsp
+            httpRequest.getRequestDispatcher("/WEB-INF/pages/logout.jsp").forward(httpRequest, httpResponse);
+            return;
+        }
+
+        if (isLogoutJspRequest) {
+            // Allow access to logout.jsp without authentication
+            httpRequest.getRequestDispatcher("/WEB-INF/pages/logout.jsp").forward(httpRequest, httpResponse);
+            return;
+        }
 
         // Check if the user is authenticated via session
+        HttpSession session = httpRequest.getSession(false);
         boolean isAuthenticated = (session != null && session.getAttribute("user") != null && session.getAttribute("userId") != null);
 
         // Check the role cookie for admin access
@@ -54,7 +80,7 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
         } else if (isAuthenticated && !isAdmin) {
             // User is authenticated but not an admin, redirect to /booking
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/booking");
+            httpResponse.sendRedirect(contextPath + "/booking");
         } else if (isLoginRequest) {
             // Allow login page access
             chain.doFilter(request, response);

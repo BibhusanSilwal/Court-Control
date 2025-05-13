@@ -25,8 +25,8 @@
         <a href="${pageContext.request.contextPath}/admin/courts" class="nav-item ${pageContext.request.requestURI.contains('courts') ? 'active' : ''}">
             <span class="icon">🏀</span> Courts
         </a>
-        <a href="${pageContext.request.contextPath}/admin/analytics" class="nav-item ${pageContext.request.requestURI.contains('analytics') ? 'active' : ''}">
-            <span class="icon">📊</span> Analytics
+        <a href="${pageContext.request.contextPath}/admin/users" class="nav-item ${pageContext.request.requestURI.contains('users') ? 'active' : ''}">
+            <span class="icon">👥</span> Users
         </a>
         <a href="${pageContext.request.contextPath}/admin/feedback" class="nav-item ${pageContext.request.requestURI.contains('feedback') ? 'active' : ''}">
             <span class="icon">📝</span> Feedback
@@ -37,8 +37,7 @@
     </nav>
     <div class="sidebar-footer">
         <div class="user-profile">
-            <span class="user-role">ADMIN</span>
-            <span class="user-email">${sessionScope.user != null ? sessionScope.user : "admin@gm..."}</span>
+            <span class="user-role">Logout</span>
             <a href="${pageContext.request.contextPath}/logout" class="logout-btn">➡️</a>
         </div>
     </div>
