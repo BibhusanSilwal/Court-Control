@@ -55,4 +55,46 @@ public class ProfileService {
 
         return success;
     }
+
+    /**
+     * Updates a user's password in the database.
+     * @param userId The ID of the user to update
+     * @param newPassword The new encrypted password (salt:hash format)
+     * @return true if the update was successful, false otherwise
+     * @throws SQLException If a database error occurs
+     * @throws ClassNotFoundException 
+     */
+    public boolean updatePassword(int userId, String newPassword) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE user SET password = ? WHERE user_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        boolean success = false;
+
+        try {
+            // Establish database connection
+            conn = DbConfig.getDbConnection();
+
+            // Prepare the SQL statement
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, newPassword);
+            pstmt.setInt(2, userId);
+
+            // Execute the update
+            int rowsAffected = pstmt.executeUpdate();
+            success = rowsAffected > 0; // True if at least one row was updated
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            // Close resources
+            try {
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
+
+        return success;
+    }
 }

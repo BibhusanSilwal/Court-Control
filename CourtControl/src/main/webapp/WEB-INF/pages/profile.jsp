@@ -7,23 +7,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Page</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/profile.css">
+    <style>
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            display: none;
+        }
+        .toast.success {
+            background-color: #28a745;
+        }
+        .toast.error {
+            background-color: #dc3545;
+        }
+        .toast.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
     <script>
         function toggleEditMode() {
             document.getElementById("profile-display").style.display = "none";
             document.getElementById("profile-edit").style.display = "block";
+            document.getElementById("password-change").style.display = "none";
+            clearToasts(); // Clear toasts when switching tabs
+        }
+
+        function togglePasswordChange() {
+            document.getElementById("profile-display").style.display = "none";
+            document.getElementById("profile-edit").style.display = "none";
+            document.getElementById("password-change").style.display = "block";
+            clearToasts(); // Clear toasts when switching tabs
         }
 
         function cancelEdit() {
             document.getElementById("profile-display").style.display = "block";
             document.getElementById("profile-edit").style.display = "none";
+            document.getElementById("password-change").style.display = "none";
+            clearToasts(); // Clear toasts when canceling
         }
+
+        function showToast(message, type) {
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add("show");
+                setTimeout(() => {
+                    toast.classList.remove("show");
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300); // Match transition duration
+                }, 3000); // Display for 3 seconds
+            }, 10);
+        }
+
+        function clearToasts() {
+            const toasts = document.getElementsByClassName("toast");
+            while (toasts.length > 0) {
+                toasts[0].parentNode.removeChild(toasts[0]);
+            }
+        }
+
+        // Show toasts on page load based on request attributes
+        window.onload = function() {
+            <c:if test="${not empty success}">
+                showToast("${success}", "success");
+            </c:if>
+            <c:if test="${not empty successMessage}">
+                showToast("${successMessage}", "success");
+            </c:if>
+            <c:if test="${not empty error}">
+                showToast("${error}", "error");
+            </c:if>
+            <c:if test="${not empty passwordError}">
+                showToast("${passwordError}", "error");
+            </c:if>
+        };
     </script>
 </head>
 <body>
     <jsp:include page="header.jsp"/>
     <div class="container">
         <div class="profile-section">
-            <h2>Profile Information <a href="#" class="edit-link" onclick="toggleEditMode()">Edit</a></h2>
+            <h2>Profile Information 
+                <a href="#" class="edit-link" onclick="toggleEditMode()">Edit Profile</a> 
+                | <a href="#" class="edit-link" onclick="togglePasswordChange()">Change Password</a>
+            </h2>
             
             <!-- Display Mode -->
             <div id="profile-display">
@@ -42,7 +123,7 @@
                 </c:choose>
             </div>
 
-            <!-- Edit Mode -->
+            <!-- Edit Profile Mode -->
             <div id="profile-edit" style="display: none;">
                 <form action="${pageContext.request.contextPath}/userprofile" method="post">
                     <div class="form-group">
@@ -57,24 +138,37 @@
                         <label>Phone</label>
                         <input type="text" name="number" value="${not empty number ? number : sessionScope.user.number}">
                     </div>
-                    <c:if test="${not empty error}">
-                        <p style="color: red;">${error}</p>
-                    </c:if>
                     <div class="form-actions">
                         <button type="button" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
                         <button type="submit" class="save-btn">Save Changes</button>
                     </div>
                 </form>
             </div>
+
+            <!-- Change Password Mode -->
+            <div id="password-change" style="display: none;">
+                <form action="${pageContext.request.contextPath}/userprofile/changepassword" method="post">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" name="confirmPassword" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+                        <button type="submit" class="save-btn">Change Password</button>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="booking-section">
             <h2>Booking History</h2>
-            <c:if test="${not empty successMessage}">
-                <p style="color: green;">${successMessage}</p>
-            </c:if>
-            <c:if test="${not empty error}">
-                <p style="color: red;">${error}</p>
-            </c:if>
             <c:choose>
                 <c:when test="${not empty bookings}">
                     <c:forEach var="booking" items="${bookings}">

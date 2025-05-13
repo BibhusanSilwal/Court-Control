@@ -6,6 +6,7 @@ import com.CourtControl.service.ProfileService;
 import com.CourtControl.service.BookingService;
 import com.CourtControl.util.SessionUtil;
 import com.CourtControl.util.ValidationUtil;
+import com.CourtControl.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,7 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(asyncSupported = true, urlPatterns = {"/userprofile", "/userprofile/delete"})
+@WebServlet(asyncSupported = true, urlPatterns = {"/userprofile", "/userprofile/delete", "/userprofile/changepassword"})
 public class UserprofileController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +44,6 @@ public class UserprofileController extends HttpServlet {
         // Load user's bookings
         List<BookingModel> bookings = new ArrayList<>();
         try {
-            // Fix: Pass userId as int directly
             bookings = bookingService.getUserBookings(user.getUserId());
         } catch (Exception e) {
             request.setAttribute("error", "Failed to load bookings: " + e.getMessage());
@@ -51,11 +51,11 @@ public class UserprofileController extends HttpServlet {
         }
         request.setAttribute("bookings", bookings);
 
-        request.getRequestDispatcher("WEB-INF/pages/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/profile.jsp").forward(request, response); // Absolute path
     }
 
     /**
-     * Handles POST requests to update the user's profile or delete a booking.
+     * Handles POST requests to update the user's profile, delete a booking, or change password.
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -69,8 +69,68 @@ public class UserprofileController extends HttpServlet {
         String path = request.getServletPath();
         if ("/userprofile/delete".equals(path)) {
             handleDeleteBooking(request, response, user);
+        } else if ("/userprofile/changepassword".equals(path)) {
+            handleChangePassword(request, response, user);
         } else {
             handleUpdateProfile(request, response, user);
+        }
+    }
+
+    /**
+     * Handles password change requests with improved error handling.
+     */
+    private void handleChangePassword(HttpServletRequest request, HttpServletResponse response, CustomerModel user)
+            throws ServletException, IOException {
+        try {
+            // Get password inputs
+            String currentPassword = request.getParameter("currentPassword");
+            String newPassword = request.getParameter("newPassword");
+            String confirmPassword = request.getParameter("confirmPassword");
+
+            // Validate all fields are provided
+            if (ValidationUtil.isNullOrEmpty(currentPassword) || 
+                ValidationUtil.isNullOrEmpty(newPassword) || 
+                ValidationUtil.isNullOrEmpty(confirmPassword)) {
+                handlePasswordError(request, response, "All password fields are required.", user);
+                return;
+            }
+
+            // Validate current password
+            if (!PasswordUtil.validate(user.getPassword(), currentPassword)) {
+                handlePasswordError(request, response, "The current password you entered is incorrect. Please try again.", user);
+                return;
+            }
+
+            // Validate new password matches confirmation
+            if (!newPassword.equals(confirmPassword)) {
+                handlePasswordError(request, response, "The new password and confirmation do not match. Please ensure they are the same.", user);
+                return;
+            }
+
+            // Basic password strength check
+            if (newPassword.length() < 6) {
+                handlePasswordError(request, response, "New password must be at least 6 characters long.", user);
+                return;
+            }
+
+            // Encrypt new password
+            String newSalt = PasswordUtil.generateSalt();
+            String newEncryptedPassword = PasswordUtil.encrypt(newSalt, newPassword);
+            String newStoredPassword = newSalt + ":" + newEncryptedPassword;
+
+            // Update password in database
+            boolean updated = profileService.updatePassword(user.getUserId(), newStoredPassword);
+            if (updated) {
+                // Update session with new password
+                user.setPassword(newStoredPassword);
+                SessionUtil.setAttribute(request, "user", user);
+                response.sendRedirect(request.getContextPath() + "/userprofile?success=Password+changed+successfully");
+            } else {
+                handlePasswordError(request, response, "Could not change password. Please try again later.", user);
+            }
+        } catch (Exception e) {
+            handlePasswordError(request, response, "An unexpected error occurred while changing the password: " + e.getMessage(), user);
+            e.printStackTrace();
         }
     }
 
@@ -185,13 +245,33 @@ public class UserprofileController extends HttpServlet {
         // Reload bookings for error case
         List<BookingModel> bookings = new ArrayList<>();
         try {
-            // Fix: Pass userId as int directly
             bookings = bookingService.getUserBookings(user.getUserId());
         } catch (Exception e) {
             request.setAttribute("error", message + " Failed to load bookings: " + e.getMessage());
             e.printStackTrace();
         }
         request.setAttribute("bookings", bookings);
-        request.getRequestDispatcher("WEB-INF/pages/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/profile.jsp").forward(request, response); // Absolute path
+    }
+
+    /**
+     * Handles password change errors by setting error message and forwarding to profile JSP.
+     */
+    private void handlePasswordError(HttpServletRequest request, HttpServletResponse response, String message, CustomerModel user)
+            throws ServletException, IOException {
+        request.setAttribute("passwordError", message);
+        // Reload user details and bookings
+        request.setAttribute("username", user.getUserName());
+        request.setAttribute("email", user.getEmail());
+        request.setAttribute("number", user.getNumber());
+        List<BookingModel> bookings = new ArrayList<>();
+        try {
+            bookings = bookingService.getUserBookings(user.getUserId());
+        } catch (Exception e) {
+            request.setAttribute("passwordError", message + " Failed to load bookings: " + e.getMessage());
+            e.printStackTrace();
+        }
+        request.setAttribute("bookings", bookings);
+        request.getRequestDispatcher("/WEB-INF/pages/profile.jsp").forward(request, response); // Absolute path
     }
 }
