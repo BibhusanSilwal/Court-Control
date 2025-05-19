@@ -18,12 +18,7 @@
             </div>
 
             <div class="table-header">
-                <div class="filter">
-                    <select>
-                        <option>All Feedback</option>
-                        <option>Recent</option>
-                    </select>
-                </div>
+                
             </div>
 
             <table>

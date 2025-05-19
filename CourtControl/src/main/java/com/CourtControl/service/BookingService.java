@@ -79,7 +79,7 @@ public class BookingService {
 
         try (Connection conn = DbConfig.getDbConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId); // Use int directly
+            stmt.setInt(1, userId);
             stmt.setInt(2, Integer.parseInt(courtId));
             stmt.setDate(3, new java.sql.Date(bookingDateParsed.getTime()));
             stmt.setTimestamp(4, new java.sql.Timestamp(startDateTime.getTime()));
@@ -95,6 +95,13 @@ public class BookingService {
      * Retrieves the most recent bookings, limited by the specified number.
      */
     public List<BookingModel> getRecentBookings(int limit) throws ClassNotFoundException {
+        return searchBookings(null, limit);
+    }
+
+    /**
+     * Searches bookings based on a query string, limited by the specified number.
+     */
+    public List<BookingModel> searchBookings(String query, int limit) throws ClassNotFoundException {
         List<BookingModel> bookings = new ArrayList<>();
         String sql = "SELECT b.booking_id, u.first_name, u.last_name, u.phone_number AS customer_phone, c.courttype AS court_name, ct.courtprice, " +
                      "b.booking_date, b.start_time, b.end_time, b.status " +
@@ -102,12 +109,21 @@ public class BookingService {
                      "LEFT JOIN User u ON b.user_id = u.user_id " +
                      "LEFT JOIN Court c ON b.court_id = c.court_id " +
                      "LEFT JOIN CourtType ct ON c.courttype = ct.courttype " +
+                     (query != null && !query.trim().isEmpty() ?
+                     "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR u.phone_number LIKE ? OR c.courttype LIKE ? OR b.status LIKE ? " : "") +
                      "ORDER BY b.booking_date DESC, b.start_time DESC " +
                      "LIMIT ?";
 
         try (Connection conn = DbConfig.getDbConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, limit);
+            int paramIndex = 1;
+            if (query != null && !query.trim().isEmpty()) {
+                String searchPattern = "%" + query.trim() + "%";
+                for (int i = 0; i < 5; i++) {
+                    stmt.setString(paramIndex++, searchPattern);
+                }
+            }
+            stmt.setInt(paramIndex, limit);
             try (ResultSet rs = stmt.executeQuery()) {
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("M/d/yyyy");
                 SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mm a");
@@ -140,7 +156,7 @@ public class BookingService {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving recent bookings", e);
+            throw new RuntimeException("Error retrieving bookings", e);
         }
         return bookings;
     }
@@ -203,24 +219,21 @@ public class BookingService {
      * Deletes a booking by its ID if it belongs to the specified user.
      */
     public boolean deleteBooking(int bookingId, int userId) throws ClassNotFoundException {
-        // First, verify the booking belongs to the user
         String checkSql = "SELECT COUNT(*) FROM Booking WHERE booking_id = ? AND user_id = ?";
         String deleteSql = "DELETE FROM Booking WHERE booking_id = ? AND user_id = ?";
 
         try (Connection conn = DbConfig.getDbConnection()) {
-            // Check if the booking exists and belongs to the user
             try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
                 checkStmt.setInt(1, bookingId);
                 checkStmt.setInt(2, userId);
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     rs.next();
                     if (rs.getInt(1) == 0) {
-                        return false; // Booking doesn't exist or doesn't belong to the user
+                        return false;
                     }
                 }
             }
 
-            // Delete the booking
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
                 deleteStmt.setInt(1, bookingId);
                 deleteStmt.setInt(2, userId);

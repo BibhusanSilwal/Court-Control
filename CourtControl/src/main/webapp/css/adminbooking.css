@@ -33,7 +33,7 @@ body {
 }
 
 .new-booking-btn {
-    background-color: #FF4500; /* Orange color from the screenshot */
+    background-color: #FF4500; /* Orange color */
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -59,12 +59,32 @@ body {
     font-size: 14px;
 }
 
+.search {
+    display: flex;
+    align-items: center;
+}
+
 .search input {
     padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 5px 0 0 5px;
     font-size: 14px;
     width: 200px;
+}
+
+.search button {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #FF4500; /* Match new-booking-btn color */
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search button:hover {
+    background-color: #FF6347;
 }
 
 table {

@@ -31,9 +31,6 @@
         <a href="${pageContext.request.contextPath}/admin/feedback" class="nav-item ${pageContext.request.requestURI.contains('feedback') ? 'active' : ''}">
             <span class="icon">📝</span> Feedback
         </a>
-        <a href="${pageContext.request.contextPath}/settings" class="nav-item ${pageContext.request.requestURI.contains('settings') ? 'active' : ''}">
-            <span class="icon">⚙️</span> Settings
-        </a>
     </nav>
     <div class="sidebar-footer">
         <div class="user-profile">

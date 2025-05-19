@@ -20,7 +20,7 @@
             <ul>
                 <li><a href="${pageContext.request.contextPath}/">Home</a></li>
                 <li><a href="${pageContext.request.contextPath}/booking">Book a Court</a></li>
-                <li><a href="${pageContext.request.contextPath}/pricing">Pricing</a></li>
+                <li><a href="${pageContext.request.contextPath}/contactus">Contact us</a></li>
                 <li><a href="${pageContext.request.contextPath}/login">Login</a></li>
                 <li><a href="${pageContext.request.contextPath}/register">Register</a></li>
             </ul>

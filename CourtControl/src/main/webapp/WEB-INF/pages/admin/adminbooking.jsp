@@ -17,16 +17,11 @@
                 <a href="${pageContext.request.contextPath}/booking" class="new-booking-btn">New Booking</a>
             </div>
             <div class="table-header">
-                <div class="filter">
-                    <select>
-                        <option>All Bookings</option>
-                        <option>Confirmed</option>
-                        <option>Pending</option>
-                        <option>Completed</option>
-                    </select>
-                </div>
                 <div class="search">
-                    <input type="text" placeholder="Search bookings...">
+                    <form action="${pageContext.request.contextPath}/admin/bookings" method="get">
+                        <input type="text" name="query" placeholder="Search bookings..." value="${searchQuery}">
+                        <button type="submit">Search</button>
+                    </form>
                 </div>
             </div>
             <table>

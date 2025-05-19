@@ -21,14 +21,15 @@ public class AdminBookingController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String query = request.getParameter("query");
         List<BookingModel> bookings;
-		try {
-			bookings = bookingService.getRecentBookings(10);
-			request.setAttribute("bookings", bookings);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            bookings = bookingService.searchBookings(query, 10);
+            request.setAttribute("bookings", bookings);
+            request.setAttribute("searchQuery", query); // Preserve search query for the view
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         
         request.getRequestDispatcher("/WEB-INF/pages/admin/adminbooking.jsp").forward(request, response);
     }

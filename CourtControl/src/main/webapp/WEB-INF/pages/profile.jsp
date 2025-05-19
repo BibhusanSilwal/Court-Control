@@ -33,6 +33,11 @@
             display: block;
             opacity: 1;
         }
+        .no-bookings {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+}
     </style>
     <script>
         function toggleEditMode() {
@@ -190,40 +195,7 @@
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                    <!-- Fallback Static Booking Data -->
-                    <div class="booking">
-                        <div class="booking-details">
-                            <span>Indoor Court</span>
-                            <div class="date-time">
-                                <span class="icon calendar-icon"></span> 5/15/2023
-                                <span class="icon clock-icon"></span> 6:00 PM - 8:00 PM
-                            </div>
-                        </div>
-                        <div class="status completed">Completed</div>
-                        <div class="price">NPR 2400</div>
-                    </div>
-                    <div class="booking">
-                        <div class="booking-details">
-                            <span>Outdoor Court</span>
-                            <div class="date-time">
-                                <span class="icon calendar-icon"></span> 5/20/2023
-                                <span class="icon clock-icon"></span> 4:00 PM - 5:00 PM
-                            </div>
-                        </div>
-                        <div class="status upcoming">Upcoming</div>
-                        <div class="price">NPR 800</div>
-                    </div>
-                    <div class="booking">
-                        <div class="booking-details">
-                            <span>Training Court</span>
-                            <div class="date-time">
-                                <span class="icon calendar-icon"></span> 5/25/2023
-                                <span class="icon clock-icon"></span> 7:00 AM - 9:00 AM
-                            </div>
-                        </div>
-                        <div class="status upcoming">Upcoming</div>
-                        <div class="price">NPR 3000</div>
-                    </div>
+                    <p>No bookings made.</p>
                 </c:otherwise>
             </c:choose>
         </div>

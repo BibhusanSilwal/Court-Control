@@ -22,22 +22,18 @@
                 <div class="metric-card">
                     <h3>Total Bookings</h3>
                     <p class="metric-value">${totalBookings}</p>
-                    <p class="metric-change positive">+12% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Revenue</h3>
                     <p class="metric-value">${totalRevenue}</p>
-                    <p class="metric-change positive">+8% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Active Users</h3>
                     <p class="metric-value">${activeUsers}</p>
-                    <p class="metric-change positive">+18% from last month</p>
                 </div>
                 <div class="metric-card">
                     <h3>Avg. Session</h3>
                     <p class="metric-value">${avgSession}</p>
-                    <p class="metric-change positive">+5% from last month</p>
                 </div>
             </section>
             <section class="charts">
